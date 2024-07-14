@@ -8,12 +8,14 @@ function TopBar() {
       <div className="w-full max-w-screen-xl mx-auto flex justify-between items-center">
         <img src="/assets/images/logo.svg" className="h-full" alt="logo" />
 
-        <div className="flex w-full max-w-sm items-center">
-          <Input type="text" placeholder="Search" className="shad-input !h-10" />
+        <form className="flex w-full max-w-sm items-center">
+          <Input type="text" placeholder="Search" className="shad-input !h-8 md:!h-10" />
+          <div className="max-sm:hidden">
           <Button type="submit" size="icon" className="shad-button_primary">
             <SearchIcon className="w-3 h-3" />
           </Button>
-        </div>
+          </div>
+        </form>
       </div>
     </header>
   )

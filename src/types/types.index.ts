@@ -8,6 +8,7 @@ export type IContextType = {
     setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
     token: string;
     setToken: React.Dispatch<React.SetStateAction<string>>;
+    signOut: () => Promise<boolean>;
     checkAuthUser: () => Promise<boolean>;
     storeToken: (token: string | null, timeout?: number) => Promise<boolean>;
 

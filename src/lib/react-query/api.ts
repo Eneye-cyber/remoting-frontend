@@ -8,7 +8,7 @@ export const API = 'http://localhost:8000/api'
 export async function signInAccount(user: {email: string, password: string}) {
   let result = null;
   let error = null;
-  let url = `${API}/login`
+
   try {
     let {email, password} = user;
     const formData = new FormData();
@@ -19,15 +19,6 @@ export async function signInAccount(user: {email: string, password: string}) {
     const req = await api.post('/login', formData)
     result = req
 
-    // if(req.status === 200 && req.statusText === "OK") {
-    //   const res = await req.json();
-    //   result = res.data
-    // }
-
-    // if(req.status !== 200 || req.statusText !== "OK") {
-    //   const { message } = req.status === 401 ? await req.json() : 'Unable to Sign in';
-    //   throw new Error(message);
-    // }
   } catch (e: any) {
     console.log(e)
     error = e?.message ?? 'Unable to Sign In User'
@@ -53,6 +44,28 @@ export async function getCurrentUser():Promise<CurrentUser | null> {
     console.log(error)
   }
   return result
+}
+
+export async function signUserOut() {
+  let isLoggedOut = false
+  let error = null
+  const token = getCookie()
+  if(!token) return {isLoggedOut, error}
+  try {
+    const api = new FetchWrapper();
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+
+    await api.get('/signout', headers)
+    isLoggedOut = true
+
+  } catch (e: any) {
+    console.log(e)
+    error = e?.message ?? 'Sign out error'
+  }
+  return {isLoggedOut, error}
 }
 
 

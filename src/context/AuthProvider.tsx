@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/lib/react-query/api'
+import { getCurrentUser, signUserOut } from '@/lib/react-query/api'
 import { IContextType, IUser } from '@/types/types.index'
 import {createContext, useContext, useEffect, useState} from 'react'
 
@@ -16,6 +16,7 @@ const INITIAL_STATE = {
   setToken: () => '',
   setUser: () => {},
   setIsAuthenticated: () => {},
+  signOut: async () => false as boolean,
   checkAuthUser: async () => false as boolean,
   storeToken: async () => false as boolean,
 }
@@ -28,10 +29,23 @@ function AuthProvider({ children }: {children: React.ReactNode}) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [token, setToken] = useState('')
 
+  const signOut = async () => {
+    const { isLoggedOut } = await signUserOut()
+    if(isLoggedOut) {
+      setUser(INITIAL_USER)
+      setIsAuthenticated(false)
+      setToken('')
+      localStorage.setItem('cookieFallback', "");
+      localStorage.setItem('cookieExpiry', JSON.stringify(0))
+      return true
+    }
+    return false
+  }
+
   const checkAuthUser = async () => {
     try {
       const currentUser = await getCurrentUser()
-      if(!currentUser) return false
+      if(!currentUser) return signOut()
 
       const {token, expires_in, user} = currentUser
       const {id, name, email} = user
@@ -50,6 +64,8 @@ function AuthProvider({ children }: {children: React.ReactNode}) {
     }
   }
 
+
+
   // Store Token in Localstorage
   const storeToken = async (token: string|null, timeout: number = 3600 ): Promise<boolean> => {
     if(!token) return false
@@ -66,7 +82,7 @@ function AuthProvider({ children }: {children: React.ReactNode}) {
     checkAuthUser()
   }, [])
 
-  const value = { user, setUser, isLoading, token, isAuthenticated, setIsAuthenticated, setToken, checkAuthUser, storeToken}
+  const value = { user, setUser, isLoading, token, isAuthenticated, setIsAuthenticated, signOut, setToken, checkAuthUser, storeToken}
 
   return (
     <AuthContext.Provider value={value}>

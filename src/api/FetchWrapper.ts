@@ -1,5 +1,7 @@
 type bodyData = string | FormData | null
-const API = 'http://localhost:8000/api'
+
+const env = import.meta.env
+const API = env.VITE_API_URL
 
 class FetchWrapper {
     private baseURL: string;
