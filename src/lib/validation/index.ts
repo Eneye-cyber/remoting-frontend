@@ -29,10 +29,10 @@ export const SignupValidation = z.object({
 // ============================================================
 export const PostBookValidation = z.object({
   title: z.string().min(2, { message: "Minimum 2 characters." }).max(100, { message: "Maximum title length is 100 characters" }),
-  description: z.string().min(80, { message: "Minimum 80 characters." }).max(100, { message: "Maximum description length is 2200 characters" }),
+  description: z.string().min(80, { message: "Minimum 80 characters." }).max(2200, { message: "Maximum description length is 2200 characters" }),
   published_at: z.string().date(),
-  cover_image: z.instanceof(File),
-  book_file: z.instanceof(File).optional(),
+  cover_image: z.any().refine((file) => file instanceof File, "Cover image is required"),
+  book_file: z.any().optional().refine((file) => file instanceof File || file === undefined, "Book must be a file"),
   status: z.custom<Status>(),
   author_id: z.string().optional(),
 });
@@ -43,6 +43,14 @@ export const PostAuthorValidation = z.object({
   slug: z.string(),
   profile_image: z.any().refine((file) => file instanceof File, "File is required"),
   biography: z.string().min(80, { message: "Minimum 2 characters." }).max(2200, { message: "Maximum description length is 2200 characters" }),
+});
+
+export const EditBookValidation = z.object({
+  title: z.string().min(2, { message: "Minimum 2 characters." }).max(100, { message: "Maximum title length is 100 characters" }),
+  description: z.string().min(80, { message: "Minimum 80 characters." }).max(2200, { message: "Maximum description length is 2200 characters" }),
+  published_at: z.string().date(),
+  status: z.custom<Status>(),
+  author_id: z.string().optional(),
 });
 
 export const EditAuthorValidation = z.object({

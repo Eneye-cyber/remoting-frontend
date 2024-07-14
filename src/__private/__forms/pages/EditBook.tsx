@@ -1,63 +1,90 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea";
 import { useUserContext } from "@/context/AuthProvider"
 import { Input } from "@/components/ui/input"
-import { PostAuthorValidation } from "@/lib/validation"
+import { EditBookValidation } from "@/lib/validation"
 import Loader from "@/components/shared/Loader"
 import { useToast } from "@/components/ui/use-toast"
-import { useCreateAuthor } from "@/lib/react-query/queriesAndMutations"
-import { useEffect } from "react"
+import { useShowBook, useGetAuthor, useUpdateBook } from "@/lib/react-query/queriesAndMutations"
+import { getCurrentDate } from "@/lib/utils"
+import { Status } from "@/types/types.index"
+import { RadioGroupItem , RadioGroup} from "@/components/ui/radio-group"
+
 
 
 function EditBook() {
   const { toast } = useToast()
   const { token } = useUserContext();
-  const { mutateAsync: submitAuthor, isPending: isLoadingCreate} = useCreateAuthor()
   const navigate = useNavigate()
-  // const { watch, setValue } = useForm();
+  const { id } = useParams()
+
+
+  const { data: authors} = useGetAuthor(token)
+  const {data: book, isError: error, isPending: isLoading} = useShowBook(token, id ?? '')
+  const { mutateAsync: submitBook, isError: updateError, isPending: isUpdating} = useUpdateBook()
+
+  if(error) {
+    toast({ title: 'Error retrieving book info'})
+    navigate(-1)
+  }
 
   // 1. Define  form.
-  const form = useForm<z.infer<typeof PostAuthorValidation>>({
-    resolver: zodResolver(PostAuthorValidation),
+  const form = useForm<z.infer<typeof EditBookValidation>>({
+    resolver: zodResolver(EditBookValidation),
     defaultValues: {
-      first_name: '',
-      last_name: '',
-      slug: '',
-      biography: ''
+      title: '',
+      description: '',
+      published_at: '',
+      status: Status['UNAVAILABLE'],
+      author_id: ''
+    },
+    mode: 'onChange',
+    values: {
+      title: book ? book.title : '',
+      description: book ? book.description : '',
+      published_at: book ? book.published_at : '',
+      status: book ? book.status : Status['UNAVAILABLE'],
+      author_id: book ? book.author.id  : ''
     },
   })
 
-  
-  const firstName = form.watch('first_name');
-  const lastName = form.watch('last_name');
 
-
-
-  useEffect(() => {
-    const slug = `${firstName}-${lastName}`.toLowerCase().replace(/\s+/g, '-');
-    const singleValue = !firstName ? lastName : firstName;
-
-    (firstName && lastName) ? form.setValue('slug', slug) : form.setValue('slug', singleValue.toLowerCase());
-  }, [firstName, lastName]);
-
-
-
-  const imageRef = form.register("profile_image");
 
   // 2. Define a submit handler.
-  const onSubmit = async (values: z.infer<typeof PostAuthorValidation>) => {
-    const newAuthor = await submitAuthor({body: values, token: token})
-    if(!newAuthor) {
-      toast({ title: 'Pleade try again'})
+  const onSubmit = async (values: z.infer<typeof EditBookValidation>) => {
+    const updatedBook = await submitBook({body: values, token: token, id: id ?? ''})
+    if(!updatedBook) {
+      console.log('updateError', updateError)
+      toast({ title: 'Please try again'})
+      return
     }
     
-    navigate('/')
+    navigate(`/books/${updatedBook.id}`)
   }
+
+  
+  const maxDate = getCurrentDate()
+
+
+  const authorList = authors?.map((author, ind) => (
+  <SelectItem key={ind} aria-selected={author.id === book?.author?.id} value={author.id}>{author.name}</SelectItem>
+  ))
+  const statusList = Object.entries(Status).map(key => (
+    <FormItem key={key[1]} className="flex items-center space-x-3 space-y-0">
+      <FormControl>
+        <RadioGroupItem value={key[1]} />
+      </FormControl>
+      <FormLabel className="font-normal">
+        {key[0]}
+      </FormLabel>
+    </FormItem>
+  ))
 
   return (
     <Form {...form}>
@@ -65,92 +92,109 @@ function EditBook() {
 
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">Edit Book Information</h2>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 lg:px-10 w-full mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            
+        {
+          isLoading ? (
+            <section className="flex items-center justify-center h-60 w-full">
+              <Loader />
+            </section>
+          ) : (
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 lg:px-10 w-full mt-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input type="text" className="shad-input" {...field} />
+                    </FormControl>
+                    <FormMessage className="shad-form_message" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Book completion status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-wrap space-x-3"
+                      >
+                        {statusList}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <FormField
               control={form.control}
-              name="first_name"
+              name="author_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input type="text" className="shad-input" {...field} />
-                  </FormControl>
+                  <FormLabel className="shad-form_label">Author</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue className="shad-input" placeholder={book?.author.name ?? "Select author"}>
+                          {book?.author.name}
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {authorList}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    You can add authors to our collection{" "}
+                    <Link className="text-primary-600" to="/forms/create-author">here</Link>.
+                  </FormDescription>
                   <FormMessage className="shad-form_message" />
                 </FormItem>
               )}
             />
 
+            <div className="w-full space-y-2">
+              <label htmlFor="published_at" className="text-sm font-medium leading-none shad-form_label">Publication date</label>
+              <input type="date" max={maxDate} id="published_at" className="shad-input pl-3 w-full relative" {...form.register("published_at")} />
+            </div>
+
             <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last name</FormLabel>
-                  <FormControl>
-                    <Input type="text" className="shad-input" {...field} />
-                  </FormControl>
-                  <FormMessage className="shad-form_message" />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unique slug</FormLabel>
-                <FormControl>
-                  <Input type="text" disabled aria-disabled className="shad-input" {...field} />
-                </FormControl>
-                <FormMessage className="shad-form_message" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="profile_image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cover image</FormLabel>
-                <FormControl>
-                  <Input type="file" className="shad-input " {...imageRef}/>
-                </FormControl>
-                <FormMessage className="shad-form_message" />
-              </FormItem>
-            )}
-          />
-
-        <FormField
-            control={form.control}
-            name="biography"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="shad-form_label">Author Biography</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="shad-textarea custom-scrollbar"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="shad-form_message" />
-              </FormItem>
-            )}
-          />
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="shad-form_label">Book Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="shad-textarea custom-scrollbar"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="shad-form_message" />
+                  </FormItem>
+                )}
+              />
 
 
-          <Button type="submit" className="shad-button_primary">
-            {
-              isLoadingCreate ? ( <div className="flex-center gap-2"> <Loader /> Loading...</div> ) : "Submit"
-            }
-          </Button>
+              <Button type="submit" className="shad-button_primary">
+                {
+                  isUpdating ? (
+                  <div className="flex-center gap-2">
+                    <Loader /> Loading...</div>
+                  ): "Submit"
+                }
+              </Button>
 
-        </form>
+            </form>
+          )
+        }
 
       </div>
     </Form>

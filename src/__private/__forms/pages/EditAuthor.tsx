@@ -50,10 +50,10 @@ function EditAuthor() {
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof EditAuthorValidation>) => {
-    console.log(values)
     const newAuthor = await submitAuthor({body: values, token: token, id: id ?? ''})
     if(!newAuthor || updateError) {
       toast({ title: 'Please try again'})
+      return
     }
     
     navigate(`/authors/${newAuthor.id}`)

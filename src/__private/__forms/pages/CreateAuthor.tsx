@@ -47,8 +47,6 @@ function CreateAuthor() {
 
 
 
-  const imageRef = form.register("profile_image");
-
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof PostAuthorValidation>) => {
     const newAuthor = await submitAuthor({body: values, token: token})

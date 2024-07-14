@@ -20,6 +20,7 @@ function App() {
         {/* Private routes v */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />}></Route>
+          <Route  path='/books' element={<Home />}></Route>
           <Route path='/books/:id' element={<BookDetail />}></Route>
           <Route path='/authors' element={<Authors />}></Route>
           <Route path='/authors/:id' element={<AuthorDetail />}></Route>

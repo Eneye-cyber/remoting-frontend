@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createUserAccount, signInAccount, signOutAccount, uploadFile } from './api'
-import { INewBook, INewUser, INewAuthor, IUpdateAuthor, IUploadFile } from '@/types/types.index'
-import { getBooks, postBook, showBook } from '@/api/book'
+import { INewBook, INewUser, INewAuthor, IUpdateAuthor, IUploadFile, IUpdateBook } from '@/types/types.index'
+import { getBooks, postBook, showBook, updateBook } from '@/api/book'
 import { deleteAuthor, getAuthors, postAuthor, showAuthor, updateAuthor } from '@/api/author'
 
 export const useCreateUserAccount = () => {
@@ -32,7 +32,7 @@ export const useGetBooks = (token: string) => {
   })
 }
 
-export const useShowBooks = (token: string, id: string) => {
+export const useShowBook = (token: string, id: string) => {
   return useQuery({
     queryKey: ['getBook', id],
     queryFn: () => showBook(token, id),
@@ -47,6 +47,18 @@ export const useCreateBook = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['getBooks'],
+      });
+    },
+  });
+};
+
+export const useUpdateBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (book: {body: IUpdateBook, token: string, id: string}) => updateBook(book),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['getBook'],
       });
     },
   });

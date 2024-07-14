@@ -10,6 +10,7 @@ import Loader from "@/components/shared/Loader"
 import { useToast } from "@/components/ui/use-toast"
 import { useSignInAccount } from "@/lib/react-query/queriesAndMutations"
 import { useUserContext } from "@/context/AuthProvider"
+import { CurrentUser } from "@/types/types.index";
 
 
 function SigninForm() {
@@ -32,8 +33,8 @@ function SigninForm() {
   async function onSubmit(values: z.infer<typeof SigninValidation>) {
     const {result, error} = await signInUser({email: values.email, password: values.password})
 
-    if(error) return toast ({title: error})
-    const { token, expires_in } = result
+    if(error || !result) return toast ({title: error})
+    const { token, expires_in } = result as CurrentUser
     
     await storeToken(token, expires_in);
     const isLoggedIn = await checkAuthUser()

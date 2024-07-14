@@ -1,7 +1,6 @@
-import { AuthorCollection, AuthorResource, INewAuthor, INewBook, IUpdateAuthor, IUpdateBook } from "@/types/types.index";
+import { AuthorCollection, AuthorResource, INewAuthor, IUpdateAuthor } from "@/types/types.index";
 import FetchWrapper from "./FetchWrapper";
 
-export const API = 'http://localhost:8000/api'
 
   
 export async function getAuthors(token: string) {

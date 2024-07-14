@@ -13,7 +13,7 @@ function RootLayout() {
   const navLinks = [
     {name: 'Home', path: '/'},
     {name: 'Authors', path: '/authors'},
-    {name: 'Profile', path: '/profile'}
+    // {name: 'Profile', path: '/profile'}
   ]
 
   const toggleButtonVisibility = () => {

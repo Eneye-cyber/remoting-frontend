@@ -1,4 +1,4 @@
-import { BookCollection, BookResource, INewBook, INewUser, IUpdateBook } from "@/types/types.index";
+import { BookCollection, BookResource, INewBook, IUpdateBook } from "@/types/types.index";
 import FetchWrapper from "./FetchWrapper";
 
 export const API = 'http://localhost:8000/api'
@@ -68,7 +68,9 @@ export async function postBook({body, token}: {body: INewBook, token: string}) {
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
         const value = data[key as keyof typeof data]
-        formData.append(key, value)
+        if(value) {
+          formData.append(key, value)
+        }
       }
     }
 
@@ -82,9 +84,11 @@ export async function postBook({body, token}: {body: INewBook, token: string}) {
   return result
 }
 
-export async function updateBook(token: string, book: IUpdateBook) {
-  let result = null;
-  let error = null;
+export async function updateBook(
+  {token, body, id}: {body: IUpdateBook, token: string, id: string}
+): Promise<BookResource | null> {
+  let result: BookResource | null = null;
+  let error: string | null = null;
   try {
     if(!token) {
       throw new Error('Unauthorized entry')
@@ -95,12 +99,15 @@ export async function updateBook(token: string, book: IUpdateBook) {
       'Authorization': `Bearer ${token}`,
       "Content-Type": "application/json",
     }
-    result = await api.put(`/books`, book, headers)
+    const req: BookResource = await api.put(`/books/${id}`, body, headers)
+    result = req
   } catch (e: any) {
     console.log(e)
     error = e?.message ?? 'Something went wrong'
+    let errorMessage: string = error as string;
+    throw new Error(errorMessage);
   }
-  return {result, error}
+  return result
 }
 
 export async function deleteBook(token: string, id: string) {

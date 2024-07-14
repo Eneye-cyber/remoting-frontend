@@ -29,7 +29,7 @@ export type IContextType = {
     description: string
     published_at: string
     status: Status
-    author_id: string
+    author_id?: string | undefined
   };
   
   export type INewAuthor = {
@@ -82,6 +82,7 @@ export type IContextType = {
     BOOK = "book",
   }
 
+  export type Variant =  "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" 
 
 // API Response
 

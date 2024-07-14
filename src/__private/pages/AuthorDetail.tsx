@@ -6,13 +6,14 @@ import { DeleteModel } from "@/components/shared/DeleteModel";
 import FileUploader from "@/components/shared/FileUploader";
 import { Group } from "@/types/types.index";
 import { LucidePen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function BookDetail() {
   const { token } = useUserContext();
   const { id } = useParams()
   const navigate = useNavigate()
 
-  if(!id) navigate('/')
+  if(!id || id === 'null') navigate('/')
 
   const {data: author, isError: error, isPending: isLoading} = useShowAuthor(token, id ?? '')
   
@@ -51,7 +52,9 @@ function BookDetail() {
                 <Link to={`/forms/edit-author/${id}`} className="underline small-regular text-secondary-500 flex-center gap-3  mb-3">
                   <LucidePen className="w-4 h-4" /> Edit Author Information
                 </Link>
-                <FileUploader group={Group['AUTHOR']} label="Change Profile Picture" />
+                <FileUploader group={Group['AUTHOR']}>
+                  <Button variant="link">Change Profile Picture</Button>
+                </FileUploader>
                 <DeleteModel id={id ?? ''} group="author" />
               </aside>
     

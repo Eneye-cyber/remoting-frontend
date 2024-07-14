@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthProvider";
 import { useUploadFile } from "@/lib/react-query/queriesAndMutations";
@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-function FileUploader({label, group}: {label: string, group: Group}) {
+function FileUploader({ group, children}: {group: Group, children: ReactNode}) {
     const { token } = useUserContext();
     const { id } = useParams()
     const [open, setOpen] = useState(false);
@@ -56,7 +56,7 @@ function FileUploader({label, group}: {label: string, group: Group}) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="link">{label}</Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

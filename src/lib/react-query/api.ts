@@ -2,7 +2,7 @@ import { CurrentUser, INewUser, IUploadFile } from "@/types/types.index";
 import { getCookie } from "../utils";
 import FetchWrapper from "@/api/FetchWrapper";
 
-export const API = 'http://localhost:8000/api'
+export const API = import.meta.env.VITE_API_URL
 
   
 export async function signInAccount(user: {email: string, password: string}) {
@@ -16,7 +16,7 @@ export async function signInAccount(user: {email: string, password: string}) {
     formData.append('password', password)
     const api = new FetchWrapper()
 
-    const req = await api.post('/login', formData)
+    const req: CurrentUser = await api.post('/login', formData)
     result = req
 
   } catch (e: any) {
@@ -143,7 +143,9 @@ export async function uploadFile({body, token}: {body: IUploadFile, token: strin
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
         const value = data[key as keyof typeof data]
-        formData.append(key, value)
+        if(value) {
+          formData.append(key, value)
+        }
       }
     }
 

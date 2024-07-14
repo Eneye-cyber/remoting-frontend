@@ -22,7 +22,6 @@ class FetchWrapper {
 
         if(data) {
             options =  Object.assign(options, {body: data}) 
-            console.log('options', options)
         }
 
         try {

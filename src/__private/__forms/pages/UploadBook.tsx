@@ -22,7 +22,7 @@ function UploadBook() {
 
   const navigate = useNavigate()
 
-  const { data: authors, isPending: isLoading} = useGetAuthor(token)
+  const { data: authors } = useGetAuthor(token)
   const { mutateAsync: uploadBook, isPending: isLoadingCreate} = useCreateBook()
 
   const maxDate = getCurrentDate()
@@ -41,8 +41,6 @@ function UploadBook() {
   })
 
 
-  const coverImageRef = form.register("cover_image");
-  const bookFileRef = form.register("book_file");
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof PostBookValidation>) => {
@@ -50,8 +48,8 @@ function UploadBook() {
     if(!newPost) {
       toast({ title: 'Pleade try again'})
     }
-    console.log(newPost)
-    navigate('/')
+
+    navigate(`/books/${newPost.id}`)
   }
 
   return (
@@ -82,7 +80,7 @@ function UploadBook() {
               <FormItem>
                 <FormLabel>Cover image</FormLabel>
                 <FormControl>
-                  <Input type="file" className="shad-input " {...coverImageRef}/>
+                  <Input type="file" className="shad-input"  onChange={(e) => field.onChange(e?.target?.files?.[0] ?? [])}/>
                 </FormControl>
                 <FormMessage className="shad-form_message" />
               </FormItem>
@@ -99,7 +97,7 @@ function UploadBook() {
               <FormItem>
                 <FormLabel>Book File (Optional)</FormLabel>
                 <FormControl>
-                  <Input type="file" className="shad-input " {...bookFileRef} />
+                  <Input type="file" className="shad-input" onChange={(e) => field.onChange(e?.target?.files?.[0] ?? [])}/>
                 </FormControl>
                 <FormMessage className="shad-form_message" />
               </FormItem>
@@ -178,7 +176,7 @@ function UploadBook() {
 
           <Button type="submit" className="shad-button_primary">
             {
-              isLoading ? (
+              isLoadingCreate ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...</div>
               ): "Submit"
