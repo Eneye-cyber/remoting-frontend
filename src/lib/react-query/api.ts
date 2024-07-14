@@ -2,7 +2,7 @@ import { CurrentUser, INewUser, IUploadFile, SearchResult } from "@/types/types.
 import { getCookie } from "../utils";
 import FetchWrapper from "@/api/FetchWrapper";
 
-export const API = import.meta.env.VITE_API_URL
+export const API = import.meta?.env?.VITE_API_URL ?? 'https://e-libs.onrender.com/api'
 
   
 export async function signInAccount(user: {email: string, password: string}) {

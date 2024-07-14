@@ -1,7 +1,7 @@
 type bodyData = string | FormData | null
 
-const env = import.meta.env
-const API = env.VITE_API_URL
+const env = import.meta?.env
+const API = env?.VITE_API_URL ?? 'https://e-libs.onrender.com/api'
 
 class FetchWrapper {
     private baseURL: string;
