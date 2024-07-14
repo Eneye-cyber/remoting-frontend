@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { createUserAccount, signInAccount, signOutAccount, uploadFile } from './api'
+import { createUserAccount, search, signInAccount, signOutAccount, uploadFile } from './api'
 import { INewBook, INewUser, INewAuthor, IUpdateAuthor, IUploadFile, IUpdateBook } from '@/types/types.index'
 import { getBooks, postBook, showBook, updateBook } from '@/api/book'
 import { deleteAuthor, getAuthors, postAuthor, showAuthor, updateAuthor } from '@/api/author'
@@ -113,6 +113,7 @@ export const useDeleteAuthor = (token: string, id: string) => {
   })
 }
 
+// Misc
 export const useUploadFile = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -124,3 +125,11 @@ export const useUploadFile = () => {
     },
   });
 };
+
+export const useSearch = (token: string, query: string) => {
+  return useQuery({
+    queryKey: [query],
+    queryFn: () => search(token, query),
+    enabled: !!query,
+  })
+}

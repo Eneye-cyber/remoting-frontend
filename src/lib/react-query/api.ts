@@ -1,4 +1,4 @@
-import { CurrentUser, INewUser, IUploadFile } from "@/types/types.index";
+import { CurrentUser, INewUser, IUploadFile, SearchResult } from "@/types/types.index";
 import { getCookie } from "../utils";
 import FetchWrapper from "@/api/FetchWrapper";
 
@@ -158,4 +158,27 @@ export async function uploadFile({body, token}: {body: IUploadFile, token: strin
   }
   return result
   
+}
+
+export async function search(token:string, query: string) {
+  let result = null;
+  let error = null;
+  
+  try {
+    if(!token) {
+      throw new Error('Unauthorized entry')
+    }
+    const api = new FetchWrapper();
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    }
+    const req: SearchResult = await api.get(`/search?query=${query}`, headers)
+    result = req;
+  } catch (e: any) {
+    console.log(e)
+    error = e?.message ?? 'Unable to Sign In User'
+    throw new Error(error as string);
+  }
+  return result
 }

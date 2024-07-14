@@ -143,3 +143,8 @@ export interface AuthorResource {
   updated_at: string
   books: BookResource[]
 }
+
+export interface SearchResult {
+  books: BookCollection[]
+  authors: AuthorCollection[]
+}

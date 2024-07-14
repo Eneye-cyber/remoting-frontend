@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import AuthLayout from './__public/AuthLayout';
 import { Login, Register } from '@/__public/pages';
-import { Home, Authors, BookDetail, AuthorDetail } from './__private/pages';
+import { Home, Authors, BookDetail, AuthorDetail, Search } from './__private/pages';
 import RootLayout from './__private/RootLayout';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css'
@@ -20,6 +20,7 @@ function App() {
         {/* Private routes v */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />}></Route>
+          <Route  path='/search' element={<Search />}></Route>
           <Route  path='/books' element={<Home />}></Route>
           <Route path='/books/:id' element={<BookDetail />}></Route>
           <Route path='/authors' element={<Authors />}></Route>
