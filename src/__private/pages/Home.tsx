@@ -9,7 +9,10 @@ function Home() {
   
   const cardLists = (books && !!books.length) ? books?.map((book, index) => (
     <BookCard key={index} book={book} />
-  )) : (<h2 className="text-center text-3xl mx-auto w-full col-span-2">No Books Available</h2>)
+  )) : 
+    (<h2 className="text-center text-3xl mx-auto w-full col-span-2">
+      {error ? 'Error fetching collection' : 'No Books Available'}
+    </h2>)
 
   return (
     isLoading ? 
@@ -18,15 +21,11 @@ function Home() {
         <Loader />
       </section>
     ) : (
-      (books && !error) ? (
-        <section className="w-full px-[5%] ">
+      <section className="w-full px-[5%] ">
           <div className="w-full max-w-screen-xl grid grid-cols-1 sm:grid-cols-2 gap-6 mx-auto my-20">
             {cardLists}
           </div>
-
-        </section>
-
-      ) : (<p>Something is up</p>)
+      </section>
 
     )
   )

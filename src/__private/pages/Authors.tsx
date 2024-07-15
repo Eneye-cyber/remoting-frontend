@@ -16,7 +16,9 @@ function Authors() {
         </figcaption>
       </figure>
     </a>
-  )) : (<h2 className="text-center text-3xl mx-auto w-full col-span-2">No Books Available</h2>)
+  )) : (<h2 className="text-center text-3xl mx-auto w-full col-span-2">
+          {error ? 'Error fetching collection' : 'Author entry empty'}
+      </h2>)
 
   return (
     isLoading ? 
@@ -25,7 +27,6 @@ function Authors() {
         <Loader />
       </section>
     ) : (
-      (authors && !error) ? (
         <section className="w-full px-[5%] ">
          <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12 mx-auto text-center">Authors</h2>
           <div className="w-full max-w-screen-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mx-auto mt-12 my-20">
@@ -33,8 +34,6 @@ function Authors() {
           </div>
 
         </section>
-
-      ) : (<p>Something is up</p>)
 
     )
 

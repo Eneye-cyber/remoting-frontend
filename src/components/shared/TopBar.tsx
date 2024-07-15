@@ -17,7 +17,8 @@ function TopBar() {
   return (
     <header className="bg-dark-1 w-full px-[5%] py-4">
       <div className="w-full max-w-screen-xl mx-auto flex justify-between items-center">
-        <img src="/assets/images/logo.svg" className="h-full" alt="logo" />
+        <img src="/assets/images/logo.svg" className="hidden sm:inline-block h-full" alt="logo" loading='lazy' />
+        <img src="/assets/images/logo-mobile.svg" className="inline-block sm:hidden h-full" alt="logo" loading='lazy' />
 
         <form onSubmit={(e) => handleSearch(e)} className="flex w-full max-w-sm items-center">
           <Input type="text"  value={query} onChange={(e) => setQuery(e.target.value)} 
